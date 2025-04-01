@@ -41,12 +41,19 @@
     <li><strong>eliminarProdFis</strong>: Elimina físicamente los productos dados de baja al crear un nuevo archivo.</li>
 </ul>
 
+### Librerias
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+```
+
 ---
 
 <h4 align="center">TECNOLOGÍAS Y HERRAMIENTAS</h4>
 <div align="center">
-	<img src="https://upload.wikimedia.org/wikipedia/commons/7/76/Logo_C%2B%2B.svg" alt="Descripción de la imagen" width="130" height="90" style="margin:auto;">
-	<img src="https://upload.wikimedia.org/wikipedia/commons/d/d1/C_Programming_Language.svg" alt="Descripción de la imagen" width="130" height="90" style="margin:auto;">
+	<img src="https://www.netgen.co.za/wp-content/uploads/2022/03/C-image-for-Netgen-1024x1024.png" width="115" height="115" style="margin:auto;">
+	<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Visual_Studio_Code_1.35_icon.svg/1200px-Visual_Studio_Code_1.35_icon.svg.png" width="115" height="115" style="margin:auto;">
 </div>
 
 <h4>AUTOR:</h4>
