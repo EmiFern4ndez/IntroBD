@@ -111,6 +111,12 @@ int main(int argc, char const *argv[]){
     scanf("%s", nomArch);
     Socio s;
     int numSocio;
+    printf("        MENU        \n");
+    printf("a) Dar de alta un socio\n");
+    printf("b) Dar de baja un socio\n");
+    printf("c) Buscar socio\n");
+    printf("d) Listar socio\n");
+    printf("x) Salir\n");
     while(opcion != 'x'){
         switch (opcion){
         case 'a':{
@@ -126,7 +132,7 @@ int main(int argc, char const *argv[]){
         }
 
         case 'c':{
-            printf("Ingrese el numero del socio que quieres eliminar:");
+            printf("Ingrese el numero del socio que quieres buscar:");
             scanf("%d", &numSocio);
             if (existe(nomArch, numSocio)){
                 printf("Existe el socio con numero: %d\n", numSocio);
