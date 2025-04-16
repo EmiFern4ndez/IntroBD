@@ -26,10 +26,19 @@ void leerSocio(Socio *s){
     scanf("%s", s->domicilo);
     printf("Ingrese el nacimiento:");
     scanf("%s", s->nacimiento);
-    printf("Ingrese el Apellido y Nombre:");
-    scanf("%s", s->apeynom);
-    printf("Ingrese el Apellido y Nombre:");
+    printf("Ingrese la fecha de asociacion:");
     scanf("%s", s->asociacion);
+}
+
+void mostrarSocio(Socio s){
+    printf("---------------------------\n");
+    printf("|Numero: %d                |\n", s.num);
+    printf("|Dni: %d                   |\n", s.dni);
+    printf("|Apellido y nombre: %s     |\n", s.apeynom);
+    printf("|Domicilio: %s             |\n", s.domicilo);
+    printf("|Fecha de nacimiento: %s   |\n", s.nacimiento);
+    printf("|Fecha de asociacion: %s   |\n", s.asociacion);\
+    printf("---------------------------\n");
 }
 
 int existe(char nomArch[20], int num){
@@ -37,120 +46,164 @@ int existe(char nomArch[20], int num){
     arch = fopen(nomArch, "rb");
     int ok = 0;
     Socio socio;
-    while (fread(&socio, sizeof(Socio), 1, arch) && ok != 1){
-        if (socio.num != num){
-            ok++;
-            fclose(nomArch);
+    if (arch != NULL){
+        while (fread(&socio, sizeof(Socio), 1, arch) && (ok != 1)){
+            if (socio.num == num && socio.num != 0){
+                ok = 1;
+            }
         }
-    }
-    fclose(nomArch);
+        fclose(arch);
+    }else
+        fclose(arch);
     return ok;
 }
 
 void alta(char nomArch[20], Socio s){
-    FILE *arch;
-    arch = fopen(nomArch, "ab");
-    if (arch != NULL){
-        Socio s;
-        if (!existe(nomArch, s.num)){
+    if (!existe(nomArch, s.num)){
+        FILE *arch;
+        arch = fopen(nomArch, "ab");
+        if (arch != NULL){
             fwrite(&s, sizeof(Socio), 1, arch);
-        }else
-            printf("El socio ya existe\n");
-    }else   
-        printf("Error al crear el archivo\n");
-    fclose(arch);
+            fclose(arch);
+        }else {
+            printf("\nError al abrir el archivo\n");
+        }
+    }else {
+        printf("\nEl socio ya existe\n");
+    }
 }
 
 void baja(char nomArch[20], int num){
     FILE *arch;
-    arch = fopen(nomArch, "ab");
-    Socio socio;
-    int ok = 0;
-    if (existe(nomArch, num)){
-        while (fread(&socio, sizeof(Socio), 1, arch)){
-            if (socio.num == num){
-                socio.num = 0;
-                fseek(arch, -sizeof(Socio), SEEK_CUR); // Retrocede al inicio del registro
-                fwrite(&socio, sizeof(Socio), 1, arch);
-                fclose(nomArch);
+    arch = fopen(nomArch, "rb+");
+    if (arch != NULL){
+        Socio socio;
+        if (existe(nomArch, num)){
+            while (fread(&socio, sizeof(Socio), 1, arch)){
+                if (socio.num == num){
+                    socio.num = 0;
+                    fseek(arch, -sizeof(Socio), SEEK_CUR); // Retrocede al inicio del registro
+                    fwrite(&socio, sizeof(Socio), 1, arch);
+                }
             }
-        }
-    }else
-        fclose(nomArch);
-}
-
-void generarLista(char nomArch[20]){
-    Lista l = NULL;
-    FILE *arch;
-    Socio s;
-    arch = fopen(nomArch, "rb");
-    while (fread(&s, sizeof(Socio), 1, arch)){
-        agregarAdelante(&l, s);
+            fclose(arch);
+            printf("\nSe elimino con exito el socio\n");
+        }else
+            printf("\nNo existe el socio\n");
     }
-    fclose(nomArch);
+    fclose(arch);
 }
 
-Lista crearNodo(int num){
+Lista crearNodo(Socio s){
     Lista nue = (Lista)malloc(sizeof(struct lista));
-    nue ->dato = num;
+    nue ->dato = s;
     nue ->sig = NULL;
     return nue;
 }
 
-void agregarAdelante (Lista *l, int num){
+void agregarAdelante (Lista *l, Socio s){
     Lista nue = malloc(sizeof(Lista));
-    nue->dato = num;                                
+    nue->dato = s;                                
     nue->sig = *l;
     *l = nue;
 }
 
-int main(int argc, char const *argv[]){
-    char nomArch[20];
-    char opcion;
-    printf("Ingrese el nombre del archivo:");
-    scanf("%s", nomArch);
+void generarLista(char nomArch[20], Lista *l){
+    FILE *arch;
+    Socio s;
+    arch = fopen(nomArch, "rb");
+    while (fread(&s, sizeof(Socio), 1, arch)){
+        if (s.num != 0){
+            agregarAdelante(l, s);
+        }
+    }
+    fclose(arch);
+}
+
+void mostrarLista(Lista l){
+    if (l != NULL){
+        mostrarSocio(l->dato);
+        mostrarLista(l->sig);
+    }
+}
+
+void mostrarMenu(){
+    printf("---------------------------\n");
+    printf("|         MENU            |\n");
+    printf("| 1) Dar de alta un socio |\n");
+    printf("| 2) Dar de baja un socio |\n");
+    printf("| 3) Buscar socio         |\n");
+    printf("| 4) Listar socio         |\n");
+    printf("| 5) Salir                |\n");
+    printf("---------------------------\n");
+}
+
+void menu(char nomArch[20]){
+    int opcion;
     Socio s;
     int numSocio;
-    printf("        MENU        \n");
-    printf("a) Dar de alta un socio\n");
-    printf("b) Dar de baja un socio\n");
-    printf("c) Buscar socio\n");
-    printf("d) Listar socio\n");
-    printf("x) Salir\n");
-    while(opcion != 'x'){
-        switch (opcion){
-        case 'a':{
-            leerSocio(&s);
-            alta(nomArch, s);
-        }
-
-        case 'b':{
-            printf("Ingrese el numero del socio que quieres eliminar:");
-            scanf("%d", &numSocio);
-            baja(nomArch, numSocio);
-            break;
-        }
-
-        case 'c':{
-            printf("Ingrese el numero del socio que quieres buscar:");
-            scanf("%d", &numSocio);
-            if (existe(nomArch, numSocio)){
-                printf("Existe el socio con numero: %d\n", numSocio);
-            }else
-                printf("No existe el socio\n");
-            break;
-        }
-
-        case 'd':{
-            generarLista(nomArch);
-        }
-
-        case 'x':
-            break;
-        }
-        printf(" Opcion: ");
-        scanf(" %c", &opcion);
+    Lista l = NULL;
+    mostrarMenu();
+    scanf("%d", &opcion);
+    while (opcion < 1 || opcion > 5) {
+        printf("\nOpcion incorrecta. Ingrese una opcion valida (1-5): \n");
+        mostrarMenu();
+        scanf("%d", &opcion);
     }
-    return 0;
 
+    while(opcion != 5){
+        switch (opcion){
+            case 1:{
+                leerSocio(&s);
+                alta(nomArch, s);
+                break;
+            }
+
+            case 2:{
+                printf("\nIngrese el numero del socio que quieres eliminar:");
+                scanf("%d", &numSocio);
+                baja(nomArch, numSocio);
+                break;
+            }
+
+            case 3:{
+                printf("\nIngrese el numero del socio que quieres buscar: ");
+                scanf("%d", &numSocio);
+                if (existe(nomArch, numSocio)){
+                    printf("\nExiste el socio con numero: %d\n", numSocio);
+                }else{
+                    printf("\nNo existe el socio\n");
+                }
+                break;
+            }
+
+            case 4:{
+                generarLista(nomArch, &l);
+                if (l != NULL){
+                    mostrarLista(l);
+                }else
+                    printf("\nEl archivo esta vacio\n");
+                break;
+            }
+
+            case 5:
+                break;
+        }
+
+        mostrarMenu();
+        scanf("%d", &opcion);
+        while (opcion < 1 || opcion > 5) {
+            printf("Opcion incorrecta. Ingrese una opcion valida (1-5): \n");
+            mostrarMenu();
+            scanf("%d", &opcion);
+        }
+    }
+}
+
+int main(){
+    char nomArch[20];
+    printf("Ingrese el nombre del archivo:");
+    scanf("%s", nomArch);
+    menu(nomArch);
+    return 0;
 }
